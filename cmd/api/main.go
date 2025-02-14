@@ -2,10 +2,13 @@ package main
 
 import (
 	"go-db-project/internal/api"
+	"go-db-project/internal/store"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -20,8 +23,13 @@ func main() {
 }
 
 func run() error {
-	db := make(map[string]string)
-	handler := api.NewHandler(db)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	store := store.NewStore(rdb)
+	handler := api.NewHandler(store)
 	s := http.Server{
 		Addr:                         ":8080",
 		Handler:                      handler,

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"go-db-project/internal/store"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,7 +13,7 @@ type Response struct {
 	Data  any    `json:"data,omitempty"`
 }
 
-func NewHandler(db map[string]string) http.Handler {
+func NewHandler(store store.Store) http.Handler {
 	r := chi.NewMux()
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.RequestID)
@@ -20,8 +21,8 @@ func NewHandler(db map[string]string) http.Handler {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/url", func(r chi.Router) {
-			r.Post("/shorten", handlePost(db))
-			r.Get("/{code}", handleGet(db))
+			r.Post("/shorten", handlePost(store))
+			r.Get("/{code}", handleGet(store))
 		})
 	})
 
